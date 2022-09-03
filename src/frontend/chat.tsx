@@ -1,5 +1,6 @@
 import React from "react"
 import {
+    Alert,
     Box,
     Button,
     IconButton,
@@ -7,7 +8,7 @@ import {
     TextField,
     Typography
 } from "@mui/material"
-import { SendRounded } from "@mui/icons-material"
+import { CatchingPokemonSharp, SendRounded } from "@mui/icons-material"
 import { IAppState } from "./App"
 import { getwebsocketurl } from "./helpers"
 import { IChat, IEvent } from "../shared"
@@ -16,6 +17,7 @@ import moment from "moment";
 interface State {
     message: string
     history: IEvent<IChat>[]
+    error?: string
 }
 
 interface Props {
@@ -32,10 +34,32 @@ export class Chat extends React.Component<Props, State> {
 
     renderTimer: any;
     messagesEnd: any = undefined;
+    checker: any;
 
     componentDidMount = () => {
+        this.connectWS();
+
+        window.addEventListener("keydown", this.handleKeyPress);
+
+        this.getHistory();
+
+        // trigger a render every 30 seconds to force the moment ago text to update.
+        this.renderTimer = setInterval(() => {
+            this.setState({});
+            this.getHistory(); // attempt to load data every 30 seconds just incase.
+        }, 1000 * 30)
+
+      
+    }
+
+    connectWS = () => {
+        if (this.checker) clearTimeout(this.checker);
+        
+        this.ws = new WebSocket(getwebsocketurl());
         this.ws.onopen = () => {
             console.log('connected');
+            this.setState({ error: undefined });
+            
         }
 
         this.ws.onmessage = (ev) => {
@@ -46,12 +70,15 @@ export class Chat extends React.Component<Props, State> {
             } catch (err) { throw err; }
         }
 
-        window.addEventListener("keydown", this.handleKeyPress);
+        this.ws.onclose = () => {
+            this.setState({ error: 'websocket disconnected' });
 
-        this.getHistory();
+            this.checker = setTimeout(() => {
+                console.log('checking WS');
+                if (this.ws.readyState !== 1) this.connectWS();
+            }, 1000 * 1)
 
-        // trigger a render every 30 seconds to force the moment ago text to update.
-        this.renderTimer = setInterval(() => { this.setState({}); }, 1000*30)
+        }
     }
 
     // componentDidUpdate() {
@@ -81,6 +108,7 @@ export class Chat extends React.Component<Props, State> {
     }
 
     sendMessage = () => {
+        if (this.ws.readyState === 3) this.connectWS();
         if (!this.ws?.OPEN) throw Error('Websocket not connected!');
         if (!this.props.appState.username) throw new Error('missing username');
         if (this.state.message.trim().length === 0) return;
@@ -101,6 +129,7 @@ export class Chat extends React.Component<Props, State> {
 
     render = () => {
         return <Box sx={{ height: '100vh', width: '100vw', display: 'flex', flexDirection: 'column' }}>
+            {this.state.error && <Alert severity="error">{this.state.error}</Alert>}
             <Box sx={{ m: 1, overflow: 'scroll', flex: 1 }}>
                 {this.state.history.map(h => {
 

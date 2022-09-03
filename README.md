@@ -1,24 +1,13 @@
-# commands:
+# TS Chat
 
-```bash
-npx create-react-app@latest tschat --template typescript
-cd tschat
-git remote add origin git@github.com:rvdende/tschat.git
-mkdir src/server
-mkdir src/shared
+Built by Rouan van der Ende.
 
-# backend
-yarn add express morgan ws
-yarn add @types/express @types/morgan @types/node @types/ws -D
+# Development
 
-# frontend
-yarn add @mui/material @emotion/react @emotion/styled @mui/icons-material
+```
+yarn install
+yarn build
+node run start
 ```
 
-# watch build server
-yarn run buildserver -w
-
-
-# dev cert 
-
-https://github.com/FiloSottile/mkcert
+Open browser at http://localhost:8080

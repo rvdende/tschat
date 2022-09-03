@@ -1,10 +1,14 @@
+import { GitHub } from '@mui/icons-material';
 import {
     Alert,
+    Box,
     Button,
     Container,
     CssBaseline,
+    IconButton,
     Paper,
-    TextField
+    TextField,
+    Typography
 } from '@mui/material';
 import { useState } from 'react';
 
@@ -44,5 +48,11 @@ export function ConfigForm(props: ConfigFormProps) {
 
         {validation && <Alert severity='error'>{validation.message}</Alert>}
 
-    </Paper></Container>
+    </Paper>
+        <Box sx={{ textAlign:'center'}}>
+            <Typography></Typography>
+            <Button href="https://github.com/rvdende/tschat" startIcon={<GitHub />}>Opensource by Rouan van der Ende.</Button>
+            
+        </Box>
+    </Container>
 }
