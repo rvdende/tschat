@@ -49,11 +49,6 @@ export const startServer = async () => {
     wsserver.on('connection', (socket, req) => {
         console.log(`websocket connected ${req.url}`);
 
-        // if (req.url?.startsWith('/ws/lightState')) {
-        //     socket.send(JSON.stringify({ "type": "id", "id": "websocket:1" }));
-        //     socket.send(JSON.stringify({ "type": "payload", "origin_id": "websocket", "payload": { "led_on": false } }))
-        // }
-
         socket.on('message', async (data) => {
             try {
                 let payload = JSON.parse(data.toString());
